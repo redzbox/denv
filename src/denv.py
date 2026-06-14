@@ -9,7 +9,11 @@ if len(sys.argv) < 2:
 
 arg = sys.argv
 
-if arg[1] == "-c":
+if arg[1] == "-v" or arg[1] == "-version":
+    print("DEnv version 1.0.0\nCopyright (C) 2026 Alex Pesta")
+    exit()
+
+elif arg[1] == "-c":
     if len(arg) <= 2:
         subprocess.run(["bash", "scripts/c/c-default.sh"])
     else:
