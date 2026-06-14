@@ -10,8 +10,11 @@ if len(sys.argv) < 2:
 arg = sys.argv
 
 if arg[1] == "-v" or arg[1] == "-version":
-    print("DEnv version 1.0.0\nCopyright (C) 2026 Alex Pesta")
+    print("DEnv version 1.1.0\nCopyright (C) 2026 Alex Pesta")
     exit()
+
+elif arg[1] == "-as" or arg[1] == "-asharp":
+    subprocess.run(["bash", "scripts/asharp/asharp-default.sh"])
 
 elif arg[1] == "-c":
     if len(arg) <= 2:
@@ -36,3 +39,6 @@ elif arg[1] == "-py" or arg[1] == "-python":
         if len(arg) >= 3:
             if arg[2] == "-no-pycache":
                 subprocess.run(["bash", "scripts/python/python-no-pycache.sh"])
+
+elif arg[1] == "-cs" or arg[1] == "-csharp":
+    subprocess.run(["bash", "scripts/csharp/csharp-default.sh"])
