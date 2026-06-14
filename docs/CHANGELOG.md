@@ -1,5 +1,25 @@
 # Changelog
 
+## [a1.1.0] - Alpha 1.1.0 (14/06/2026, Sunday)
+
+### Added
+
+- A# project support
+
+- C# project support
+
+### Fixed
+
+- *None*
+
+### Removed
+
+- *None*
+
+### Modified
+
+- Changed Version Text in 'denv.py'
+
 ## [s1.0.0] - Stable 1.0.0 (14/06/2026, Sunday)
 
 ### Added
