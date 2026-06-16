@@ -7,7 +7,7 @@ echo "[DEnv C# Default] Created 3 directories: src, obj, bin"
 
 touch src/Program.cs
 touch src/MyProject.csproj
-touch run.sh
+touch .gitignore
 
 cat > src/Program.cs << EOF
 using System;
@@ -34,6 +34,29 @@ cat > src/MyProject.csproj << EOF
 </Project>
 EOF
 
+cat > .gitignore << EOF
+
+# Build output
+
+bin/
+obj/
+
+# User-specific files
+
+*.user
+*.suo
+
+# Editor files
+
+.vscode/
+.idea/
+
+# OS files
+
+.DS_Store
+Thumbs.db
 
 
-echo "[DEnv C# Default] Created 2 files: src/Program.cs, src/MyProject.csproj"
+EOF
+
+echo "[DEnv C# Default] Created 3 files: src/Program.cs, src/MyProject.csproj, .gitignore"
