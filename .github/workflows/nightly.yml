@@ -15,15 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate tag name
-        run: echo "TAG=n$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      - name: Generate tag and title
+        run: |
+          echo "TAG=n_$(date +'%d-%m-%Y')" >> $GITHUB_ENV
+          echo "TITLE=[Nightly] n$(date +'%d-%m-%Y')" >> $GITHUB_ENV
 
       - name: Create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "$TAG" \
-            --title "$TAG" \
+            --title "$TITLE" \
             --notes "Automated nightly build." \
             --prerelease \
             --target main
