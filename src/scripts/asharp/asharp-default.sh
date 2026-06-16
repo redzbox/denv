@@ -3,6 +3,7 @@
 touch src/main.adb
 touch src/project.gpr
 touch .gitignore
+touch README.md
 
 cat > src/main.adb << EOF
 with Ada.Text_IO;
@@ -44,4 +45,12 @@ Thumbs.db
 
 EOF
 
-echo "[DEnv A# Default] Created 3 files: src/main.adb, src/project.gpr, .gitignore"
+PROJECT_NAME=$(basename "$PWD")
+
+cat > README.md << EOF
+# $PROJECT_NAME
+
+Project Setup from DEnv
+EOF
+
+echo "[DEnv A# Default] Created 4 files: src/main.adb, src/project.gpr, .gitignore, README.md"
