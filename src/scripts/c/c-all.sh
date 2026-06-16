@@ -8,6 +8,7 @@ echo "[DEnv C All] Created 3 directories: build, src, include"
 
 touch src/main.c
 touch run.sh
+touch .gitignore
 
 cat > src/main.c << EOF
 #include <stdio.h>
@@ -27,4 +28,30 @@ gcc -Wall -Wextra -Werror -std=c11 src/main.c -o build/main
 
 EOF
 
-echo "[DEnv C All] Created 2 files: src/main.c, run.sh"
+cat > .gitignore << EOF
+
+# Build Output
+
+*.o
+*.out
+*.exe
+*.a
+*.so
+
+# Debug symbols
+
+*.dSYM/
+
+# Editor files
+
+.vscode/
+.idea/
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+EOF
+
+echo "[DEnv C All] Created 3 files: src/main.c, run.sh, .gitignore"
