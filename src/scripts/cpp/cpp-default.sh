@@ -8,6 +8,7 @@ echo "[DEnv C++ Default] Created 3 directories: build, src, include"
 
 touch src/main.cpp
 touch run.sh
+touch .gitignore
 
 cat > src/main.cpp << EOF
 #include <iostream>
@@ -29,4 +30,37 @@ g++ src/main.cpp -o build/main
 
 EOF
 
-echo "[DEnv C++ Default] Created 2 files: src/main.cpp, run.sh"
+cat > .gitignore << EOF
+
+# Build output
+
+*.o
+*.obj
+*.out
+*.exe
+*.a
+*.so
+*.dll
+
+# CMake
+
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# Editor files
+
+.vscode/
+.idea/
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+EOF
+
+echo "[DEnv C++ Default] Created 3 files: src/main.cpp, run.sh, .gitignore"
