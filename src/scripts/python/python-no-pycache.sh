@@ -6,6 +6,7 @@ echo "[DEnv Python No PyCache Setting] Created 1 directory: src"
 touch src/main.py
 touch run.sh
 touch .gitignore
+touch README.md
 
 cat > src/main.py << EOF
 print("Hello, World!")
@@ -54,5 +55,12 @@ Thumbs.db
 
 EOF
 
+PROJECT_NAME=$(basename "$PWD")
 
-echo "[DEnv Python No PyCache Setting] Created 3 files: src/main.py, run.sh, .gitignore"
+cat > README.md << EOF
+# $PROJECT_NAME
+
+Project Setup from DEnv
+EOF
+
+echo "[DEnv Python No PyCache Setting] Created 4 files: src/main.py, run.sh, .gitignore, README.md"
