@@ -42,3 +42,6 @@ elif arg[1] == "-py" or arg[1] == "-python":
 
 elif arg[1] == "-cs" or arg[1] == "-csharp":
     subprocess.run(["bash", "scripts/csharp/csharp-default.sh"])
+
+elif arg[1] == "-java":
+    subprocess.run(["bash", "scripts/java/java-default.sh"])
