@@ -1,5 +1,24 @@
 # Changelog
 
+## [s1.1.0] - Stable 1.1.0 (null/null/null, Null)
+
+### Added
+
+- C# Project support
+- A# Project support
+
+### Fixed
+
+- *None*
+
+### Removed
+
+- *None*
+
+### Modified
+
+- *None*
+
 ## [s1.0.0] - Stable 1.0.0 (14/06/2026, Sunday)
 
 ### Added
