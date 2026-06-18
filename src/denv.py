@@ -1,20 +1,42 @@
 #!/usr/bin/env python3
 
+import argparse
+import os
 import shutil
-import sys
 from pathlib import Path
 
 VERSION = "1.1.0"
 
 BASE_DIR = Path(__file__).resolve().parent
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+
+def get_templates():
+    templates = {}
+
+    if not TEMPLATES_DIR.exists():
+        return templates
+
+    for language_dir in TEMPLATES_DIR.iterdir():
+        if not language_dir.is_dir():
+            continue
+
+        variants = {}
+
+        for variant_dir in language_dir.iterdir():
+            if variant_dir.is_dir():
+                variants[variant_dir.name] = f"{language_dir.name}/{variant_dir.name}"
+
+        templates[language_dir.name] = variants
+
+    return templates
 
 
 def generate_from_template(template_name):
-    template_dir = BASE_DIR / "templates" / template_name
+    template_dir = TEMPLATES_DIR / template_name
 
     if not template_dir.exists():
         print(f"Template '{template_name}' not found.")
-        print(f"Expected: {template_dir}")
         return False
 
     for item in template_dir.iterdir():
@@ -29,7 +51,7 @@ def generate_from_template(template_name):
 
 
 def replace_placeholders():
-    project_name = Path.cwd().name
+    project_name = Path.cwd().resolve().name
 
     for file in Path.cwd().rglob("*"):
         if not file.is_file():
@@ -46,51 +68,94 @@ def replace_placeholders():
             pass
 
 
-if len(sys.argv) < 2:
-    print("Usage: denv <typefile> <option>")
-    sys.exit(1)
+def create_project(language, variant, project_name):
+    templates = get_templates()
 
-lang = sys.argv[1]
-option = sys.argv[2] if len(sys.argv) > 2 else None
+    if language not in templates:
+        print(f"Unknown language: {language}")
+        return
 
-if lang in ("-v", "-version"):
+    if variant not in templates[language]:
+        print(f"Unknown variant '{variant}' for '{language}'")
+        return
+
+    project_dir = Path(project_name)
+
+    if project_dir.exists():
+        print(f"Project '{project_name}' already exists.")
+        return
+
+    project_dir.mkdir()
+
+    old_cwd = Path.cwd()
+
+    try:
+        import os
+
+        os.chdir(project_dir)
+
+        template = templates[language][variant]
+
+        if generate_from_template(template):
+            replace_placeholders()
+
+    finally:
+        os.chdir(old_cwd)
+
+    print(f"Created {language} project '{project_name}' ({variant})")
+
+
+def command_create(args):
+    create_project(args.language, args.variant, args.project_name)
+
+
+def command_list(args):
+    templates = get_templates()
+
+    print("Available templates:\n")
+
+    for language, variants in templates.items():
+        print(f"{language}")
+
+        for variant in variants:
+            print(f"  └─ {variant}")
+
+        print()
+
+
+def command_version(args):
     print(f"DEnv version {VERSION}\nCopyright (C) 2026 Alex Pesta")
 
-elif lang in ("-as", "-asharp"):
-    if generate_from_template("asharp/default"):
-        replace_placeholders()
 
-elif lang == "-c":
-    if option == "-C-All":
-        if generate_from_template("c/all"):
-            replace_placeholders()
-    else:
-        if generate_from_template("c/default"):
-            replace_placeholders()
+def main():
+    parser = argparse.ArgumentParser(
+        prog="denv", description="Developer Environment Generator"
+    )
 
-elif lang in ("-cpp", "-c++"):
-    if option == "-CPP-All":
-        if generate_from_template("cpp/all"):
-            replace_placeholders()
-    else:
-        if generate_from_template("cpp/default"):
-            replace_placeholders()
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-elif lang in ("-py", "-python"):
-    if option == "-no-pycache":
-        if generate_from_template("python/nopycache"):
-            replace_placeholders()
-    else:
-        if generate_from_template("python/default"):
-            replace_placeholders()
+    create_parser = subparsers.add_parser("create", help="Create a new project")
 
-elif lang in ("-cs", "-csharp"):
-    if generate_from_template("csharp/default"):
-        replace_placeholders()
+    create_parser.add_argument("language", help="Programming language")
 
-elif lang == "-java":
-    if generate_from_template("java/default"):
-        replace_placeholders()
+    create_parser.add_argument("project_name", help="Project name")
 
-else:
-    print(f"Unknown language: {lang}")
+    create_parser.add_argument("--variant", default="default", help="Template variant")
+
+    create_parser.set_defaults(func=command_create)
+
+    list_parser = subparsers.add_parser("list", help="List available templates")
+
+    list_parser.set_defaults(func=command_list)
+
+    version_parser = subparsers.add_parser("version", help="Show version")
+
+    version_parser.set_defaults(func=command_version)
+
+    args = parser.parse_args()
+
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()
