@@ -12,7 +12,7 @@
 
 ### Removed
 
-- *None*
+- Removed entry - *subprocess* in requirements.txt
 
 ### Modified
 
