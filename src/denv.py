@@ -10,7 +10,7 @@ if len(sys.argv) < 2:
 arg = sys.argv
 
 if arg[1] == "-v" or arg[1] == "-version":
-    print("DEnv version 1.0.1\nCopyright (C) 2026 Alex Pesta")
+    print("DEnv version 1.1.0\nCopyright (C) 2026 Alex Pesta")
     exit()
 
 elif arg[1] == "-as" or arg[1] == "-asharp":
