@@ -1,51 +1,133 @@
 # Developer Environment (DEnv)
 
-## Information
+DEnv is a project scaffolding tool that generates ready-to-use development environments from templates.
 
-DEnv is a developer environment tool that automatically sets up and manages your development environment without any manual configuration.
-It is fully automated and supports multiple programming languages and frameworks. Although it is still under development, it is already a powerful tool for managing your development environment.
+Create projects for multiple programming languages in seconds, with support for template variants, placeholder variables, Git initialization, and more.
+
+---
+
+## Features
+
+- Multiple language templates
+  - Python
+  - C
+  - C++
+  - C#
+  - Java
+  - A#
+    **and more**
+
+- Template variants
+
+- Automatic placeholder replacement
+
+- Git repository initialization
+
+- Project information and template discovery
+
+- Graphical installer and uninstaller
+
+- Extensible template-based architecture
+
+---
+
+## Installation
+
+Download the latest release from:
+
+:contentReference[oaicite:0]{index=0}
+
+### Installer (Recommended)
+
+Run:
+
+```bash
+src/installer/install.py
+```
+
+The installer will:
+
+- Install DEnv
+- Create the launcher
+- Configure PATH automatically
+- Verify the installation
+
+### Uninstall
+
+Run:
+
+```bash
+src/installer/uninstall.py
+```
+
+---
 
 ## Usage
 
-**Step 1:** Download the latest release from the [GitHub repository](https://github.com/apesta0/denv/releases) and extract the archive.
-
-**Step 2:** Add the extracted directory to your system's PATH.
-
-*2.1* Open your shell configuration file (e.g. `~/.bashrc` or `~/.zshrc`) and add the following line:
+### Create a Project
 
 ```bash
-export PATH="$PATH:/path/to/denv"
+denv create python MyProject
 ```
 
-*2.2* Save the file and restart your shell using `source ~/.bashrc` or `source ~/.zshrc`.
+### Create a Project with a Variant
 
-**Step 3:** Run `./denv <filetype>` to set up your development environment for the specified filetype.
+```bash
+denv create python MyProject --variant nopycache
+```
 
-*3.1* You can also set up the environment for a specific setting using flags, for example `./denv -c -C-All`.
+### Create a Project with Git Initialized
 
+```bash
+denv create python MyProject --git
+```
+
+### Specify an Author
+
+```bash
+denv create python MyProject --author "Alex Pesta"
+```
+
+### List Available Templates
+
+```bash
+denv list
+```
+
+### View Template Information
+
+```bash
+denv info python
+```
+
+### Show Version
+
+```bash
+denv version
+```
+
+---
 
 ## Contributing
 
-Contributions are welcome! If you find a bug or have a feature request, please open an issue on the [GitHub repository](https://github.com/apesta0/denv/issues).
+Contributions, bug reports, feature requests, and pull requests are welcome.
 
-### Submitting a Pull Request
+### Getting Started
 
-To submit a pull request, please follow these steps:
+1. Fork the repository.
+2. Create a feature branch.
+3. Make your changes.
+4. Commit your work.
+5. Open a pull request.
 
-1. Fork the [GitHub repository](https://github.com/apesta0/denv/fork).
+Issues can be reported here:
 
-2. Create a new branch for your changes.
+:contentReference[oaicite:1]{index=1}
 
-3. Make your changes and commit them to your branch.
-
-4. Push your branch to your fork.
-
-5. Open a pull request on the [GitHub repository](https://github.com/apesta0/denv/pulls).
-
-### Starring
-
-If you find this project useful, please consider starring it on [GitHub](https://github.com/apesta0/denv). It is also a form of contribution and recognition for the work done by the project maintainers.
+---
 
 ## License
 
-This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+Licensed under the GNU Affero General Public License v3.0.
+
+See the LICENSE file for details.
