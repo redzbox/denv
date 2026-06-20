@@ -4,8 +4,8 @@
 
 ### Added
 
-- Added an author argument to the create command
-- Added entry - *datetime* in requirements.txt
+- Added an author and a git argument to the create command
+- Added entries - *datetime* and *subprocess* in requirements.txt
 
 ### Fixed
 
