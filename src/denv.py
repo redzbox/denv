@@ -6,7 +6,7 @@ import subprocess
 from datetime import date
 from pathlib import Path
 
-VERSION = "1.1.1"
+VERSION = "1.2.0"
 
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
