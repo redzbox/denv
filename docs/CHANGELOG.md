@@ -1,6 +1,6 @@
 # Changelog
 
-## [s1.1.0] - Stable 1.1.0 (///, /)
+## [s1.1.0] - Stable 1.1.0 20/06/2026, Saturday)
 
 ### Added
 
