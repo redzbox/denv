@@ -122,7 +122,7 @@ Contributions, bug reports, feature requests, and pull requests are welcome.
 
 Issues can be reported here:
 
-:contentReference[oaicite:1]{index=1}
+[Issues](https://github.com/apesta0/denv/issues)
 
 ---
 
