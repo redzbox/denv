@@ -1,16 +1,27 @@
 #!/usr/bin/env python3
 
+import json
 import os
 import shutil
 import stat
-import tkinter as tk
 from pathlib import Path
-from tkinter import filedialog, messagebox
+
+import gi
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+
+from gi.repository import Adw, Gtk
+
+VERSION = "1.2.0"
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 
 DEFAULT_INSTALL_DIR = Path.home() / ".local" / "share" / "denv"
 DEFAULT_BIN_DIR = Path.home() / ".local" / "bin"
+
+MANIFEST_DIR = Path.home() / ".config" / "denv"
+MANIFEST_FILE = MANIFEST_DIR / "install.json"
 
 
 def detect_shell():
@@ -34,7 +45,10 @@ def add_path_entry(bin_dir):
     if config is None:
         return
 
-    config.parent.mkdir(parents=True, exist_ok=True)
+    config.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     if shell == "fish":
         entry = f"fish_add_path {bin_dir}"
@@ -52,22 +66,55 @@ def add_path_entry(bin_dir):
         f.write(entry + "\n")
 
 
-def create_launcher(install_dir, bin_dir):
-    bin_dir.mkdir(parents=True, exist_ok=True)
+def create_launcher(
+    install_dir,
+    bin_dir,
+):
+    bin_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     launcher = bin_dir / "denv"
 
     launcher.write_text(
-        f"""#!/bin/bash
+        f'''#!/bin/bash
 python3 "{install_dir / "src" / "denv.py"}" "$@"
-"""
+'''
     )
 
     launcher.chmod(launcher.stat().st_mode | stat.S_IEXEC)
 
 
-def install(install_dir):
+def write_manifest(
+    install_dir,
+    bin_dir,
+):
+    MANIFEST_DIR.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    data = {
+        "version": VERSION,
+        "install_dir": str(install_dir),
+        "bin_dir": str(bin_dir),
+        "shell": detect_shell(),
+    }
+
+    MANIFEST_FILE.write_text(
+        json.dumps(
+            data,
+            indent=4,
+        )
+    )
+
+
+def install(
+    install_dir,
+):
     install_dir = Path(install_dir)
+
     bin_dir = DEFAULT_BIN_DIR
 
     if install_dir.exists():
@@ -82,75 +129,276 @@ def install(install_dir):
         destination = install_dir / item.name
 
         if item.is_dir():
-            shutil.copytree(item, destination)
+            shutil.copytree(
+                item,
+                destination,
+            )
         else:
-            shutil.copy2(item, destination)
+            shutil.copy2(
+                item,
+                destination,
+            )
 
-    create_launcher(install_dir, bin_dir)
+    create_launcher(
+        install_dir,
+        bin_dir,
+    )
 
     add_path_entry(bin_dir)
 
-    return install_dir
+    write_manifest(
+        install_dir,
+        bin_dir,
+    )
 
 
-class InstallerGUI:
-    def __init__(self, root):
-        self.root = root
+class InstallerWindow(Adw.ApplicationWindow):
+    def __init__(
+        self,
+        app,
+    ):
+        super().__init__(application=app)
 
-        root.title("DEnv Installer")
-        root.geometry("650x300")
+        self.set_title("DEnv Installer")
 
-        tk.Label(root, text="DEnv Installer", font=("Arial", 18, "bold")).pack(pady=10)
-
-        self.shell = detect_shell()
-
-        tk.Label(root, text=f"Detected shell: {self.shell}").pack()
-
-        frame = tk.Frame(root)
-        frame.pack(fill="x", padx=20, pady=20)
-
-        tk.Label(frame, text="Install Location:").pack(anchor="w")
-
-        self.install_path = tk.StringVar(value=str(DEFAULT_INSTALL_DIR))
-
-        tk.Entry(frame, textvariable=self.install_path, width=70).pack(
-            side="left", fill="x", expand=True
+        self.set_default_size(
+            800,
+            600,
         )
 
-        tk.Button(frame, text="Browse", command=self.browse).pack(side="left", padx=5)
+        self.install_dir = str(DEFAULT_INSTALL_DIR)
 
-        self.status = tk.Label(root, text="Ready")
+        self.stack = Gtk.Stack()
 
-        self.status.pack(pady=10)
+        self.set_content(self.stack)
 
-        tk.Button(
-            root, text="Install", command=self.run_install, height=2, width=20
-        ).pack()
+        self.build_pages()
 
-    def browse(self):
-        path = filedialog.askdirectory()
+    def build_pages(
+        self,
+    ):
+        self.build_welcome()
+        self.build_location()
+        self.build_options()
+        self.build_summary()
+        self.build_finished()
 
-        if path:
-            self.install_path.set(path)
+    def build_welcome(
+        self,
+    ):
+        box = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL,
+            spacing=24,
+            margin_top=48,
+            margin_start=48,
+            margin_end=48,
+        )
 
-    def run_install(self):
-        try:
-            self.status.config(text="Installing...")
+        title = Gtk.Label()
 
-            install(self.install_path.get())
+        title.set_markup("<span size='xx-large' weight='bold'>DEnv Installer</span>")
 
-            self.status.config(text="Installation completed.")
+        box.append(title)
 
-            messagebox.showinfo(
-                "Success",
-                ("DEnv installed successfully.\n\nYou may need to restart your shell."),
+        box.append(
+            Gtk.Label(label=(f"Welcome to the DEnv Setup Wizard.\nVersion {VERSION}"))
+        )
+
+        next_btn = Gtk.Button(label="Next")
+
+        next_btn.connect(
+            "clicked",
+            lambda *_: self.stack.set_visible_child_name("location"),
+        )
+
+        box.append(next_btn)
+
+        self.stack.add_named(
+            box,
+            "welcome",
+        )
+
+    def build_location(
+        self,
+    ):
+        box = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL,
+            spacing=24,
+            margin_top=48,
+            margin_start=48,
+            margin_end=48,
+        )
+
+        box.append(Gtk.Label(label="Installation Directory"))
+
+        self.location_entry = Gtk.Entry()
+
+        self.location_entry.set_text(str(DEFAULT_INSTALL_DIR))
+
+        box.append(self.location_entry)
+
+        next_btn = Gtk.Button(label="Next")
+
+        next_btn.connect(
+            "clicked",
+            self.location_next,
+        )
+
+        box.append(next_btn)
+
+        self.stack.add_named(
+            box,
+            "location",
+        )
+
+    def location_next(
+        self,
+        *_,
+    ):
+        self.install_dir = self.location_entry.get_text()
+
+        self.summary_label.set_text(
+            (
+                f"Version: {VERSION}\n\n"
+                f"Location:\n"
+                f"{self.install_dir}\n\n"
+                f"Shell:\n"
+                f"{detect_shell()}"
             )
+        )
+
+        self.stack.set_visible_child_name("options")
+
+    def build_options(
+        self,
+    ):
+        box = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL,
+            spacing=24,
+            margin_top=48,
+            margin_start=48,
+            margin_end=48,
+        )
+
+        self.path_check = Gtk.CheckButton(label="Add launcher to PATH")
+
+        self.path_check.set_active(True)
+
+        box.append(self.path_check)
+
+        next_btn = Gtk.Button(label="Next")
+
+        next_btn.connect(
+            "clicked",
+            lambda *_: self.stack.set_visible_child_name("summary"),
+        )
+
+        box.append(next_btn)
+
+        self.stack.add_named(
+            box,
+            "options",
+        )
+
+    def build_summary(
+        self,
+    ):
+        box = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL,
+            spacing=24,
+            margin_top=48,
+            margin_start=48,
+            margin_end=48,
+        )
+
+        self.summary_label = Gtk.Label()
+
+        box.append(self.summary_label)
+
+        install_btn = Gtk.Button(label="Install")
+
+        install_btn.add_css_class("suggested-action")
+
+        install_btn.connect(
+            "clicked",
+            self.run_install,
+        )
+
+        box.append(install_btn)
+
+        self.stack.add_named(
+            box,
+            "summary",
+        )
+
+    def run_install(
+        self,
+        *_,
+    ):
+        try:
+            install(self.install_dir)
+
+            self.stack.set_visible_child_name("finished")
 
         except Exception as e:
-            messagebox.showerror("Installation Failed", str(e))
+            dialog = Gtk.AlertDialog()
+
+            dialog.set_message("Installation Failed")
+
+            dialog.set_detail(str(e))
+
+            dialog.show(self)
+
+    def build_finished(
+        self,
+    ):
+        box = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL,
+            spacing=24,
+            margin_top=48,
+            margin_start=48,
+            margin_end=48,
+        )
+
+        box.append(
+            Gtk.Label(
+                label=(
+                    "DEnv installed successfully.\n\n"
+                    "Restart your shell to use PATH changes."
+                )
+            )
+        )
+
+        finish_btn = Gtk.Button(label="Finish")
+
+        finish_btn.connect(
+            "clicked",
+            lambda *_: self.close(),
+        )
+
+        box.append(finish_btn)
+
+        self.stack.add_named(
+            box,
+            "finished",
+        )
+
+
+class InstallerApplication(Adw.Application):
+    def __init__(
+        self,
+    ):
+        super().__init__(application_id=("io.github.apesta0.denv.installer"))
+
+    def do_activate(
+        self,
+    ):
+        window = InstallerWindow(self)
+
+        window.present()
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    InstallerGUI(root)
-    root.mainloop()
+    app = InstallerApplication()
+
+    app.run()
