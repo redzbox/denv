@@ -35,7 +35,7 @@ Create projects for multiple programming languages in seconds, with support for 
 
 Download the latest release from:
 
-:contentReference[oaicite:0]{index=0}
+[Releases](https://github.com/redzbox/denv/releases)
 
 ### Installer (Recommended)
 
