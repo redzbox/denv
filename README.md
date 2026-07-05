@@ -85,7 +85,7 @@ denv create python MyProject --git
 ### Specify an Author
 
 ```bash
-denv create python MyProject --author "Alex Pesta"
+denv create python MyProject --author "John Doe"
 ```
 
 ### List Available Templates
@@ -122,7 +122,7 @@ Contributions, bug reports, feature requests, and pull requests are welcome.
 
 Issues can be reported here:
 
-[Issues](https://github.com/apesta0/denv/issues)
+[Issues](https://github.com/redzbox/denv/issues)
 
 ---
 
