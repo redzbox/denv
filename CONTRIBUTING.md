@@ -5,7 +5,7 @@
 To get started, clone the repository and install the dependencies:
 
 ```bash
-git clone https://github.com/apesta0/denv.git
+git clone https://github.com/redzbox/denv.git
 cd denv
 pip install -r requirements.txt
 ```
